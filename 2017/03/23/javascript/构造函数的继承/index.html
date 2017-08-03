@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>构造函数的继承 | Hexo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Javascript面向对象编程（二）：构造函数的继承这个系列的第一部分，主要介绍了如何”封装”数据和方法，以及如何从原型对象生成实例。今天要介绍的是，对象之间的”继承”的五种方法。">
+<meta name="keywords" content="javascript">
+<meta property="og:type" content="article">
+<meta property="og:title" content="构造函数的继承">
+<meta property="og:url" content="http://yoursite.com/2017/03/23/javascript/构造函数的继承/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Javascript面向对象编程（二）：构造函数的继承这个系列的第一部分，主要介绍了如何”封装”数据和方法，以及如何从原型对象生成实例。今天要介绍的是，对象之间的”继承”的五种方法。">
+<meta property="og:updated_time" content="2017-05-14T02:43:52.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="构造函数的继承">
+<meta name="twitter:description" content="Javascript面向对象编程（二）：构造函数的继承这个系列的第一部分，主要介绍了如何”封装”数据和方法，以及如何从原型对象生成实例。今天要介绍的是，对象之间的”继承”的五种方法。">
+  
+    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Hexo</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Zoeken"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://yoursite.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-javascript/构造函数的继承" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/23/javascript/构造函数的继承/" class="article-date">
+  <time datetime="2017-03-23T01:46:46.000Z" itemprop="datePublished">2017-03-23</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      构造函数的继承
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Javascript面向对象编程（二）：构造函数的继承"><a href="#Javascript面向对象编程（二）：构造函数的继承" class="headerlink" title="Javascript面向对象编程（二）：构造函数的继承"></a>Javascript面向对象编程（二）：构造函数的继承</h3><p>这个系列的第一部分，主要介绍了如何”封装”数据和方法，以及如何从原型对象生成实例。<br>今天要介绍的是，对象之间的”继承”的五种方法。</p>
+<a id="more"></a>
+<p>比如，现在有一个”动物”对象的构造函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">function Animal()&#123;</div><div class="line">　　　　this.species = &quot;动物&quot;;</div><div class="line">　　&#125;</div></pre></td></tr></table></figure></p>
+<p>还有一个”猫”对象的构造函数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">function Cat(name,color)&#123;</div><div class="line">　　　　this.name = name;</div><div class="line">　　　　this.color = color;</div><div class="line">　　&#125;</div></pre></td></tr></table></figure></p>
+<p>怎样才能使”猫”继承”动物”呢？</p>
+<h4 id="一、-构造函数绑定"><a href="#一、-构造函数绑定" class="headerlink" title="一、 构造函数绑定"></a>一、 构造函数绑定</h4><p>第一种方法也是最简单的方法，使用call或apply方法，将父对象的构造函数绑定在子对象上，即在子对象构造函数中加一行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">function Cat(name,color)&#123;</div><div class="line">	Animal.apply(this,arguments);</div><div class="line">	this.name=name;</div><div class="line">	this.color=color;</div><div class="line">&#125;</div><div class="line">var cat1=new Cat(&quot;one&quot;,&quot;two&quot;);</div><div class="line">alert(cat1.species);</div></pre></td></tr></table></figure></p>
+<p>二、 prototype模式<br>第二种方法更常见，使用prototype属性。<br>如果”猫”的prototype对象，指向一个Animal的实例，那么所有”猫”的实例，就能继承Animal了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Cat.prototype=new Animal();</div><div class="line">Cat.prototype.constructor=Cat;</div><div class="line">var cat1=new Cat(&quot;one&quot;,&quot;two&quot;);</div><div class="line">alert(cat1.species);</div></pre></td></tr></table></figure></p>
+<p>代码的第一行，我们将Cat的prototype对象指向一个Animal的实例。<br><code>Cat.prototype = new Animal();</code><br>它相当于完全删除了prototype 对象原先的值，然后赋予一个新值。但是，第二行又是什么意思呢？<br><code>Cat.prototype.constructor = Cat;</code><br>原来，任何一个prototype对象都有一个constructor属性，指向它的构造函数。如果没有”Cat.prototype = new Animal();”这一行，Cat.prototype.constructor是指向Cat的；加了这一行以后，Cat.prototype.constructor指向Animal。<br><code>alert(Cat.prototype.constructor == Animal); //true</code><br>更重要的是，每一个实例也有一个constructor属性，默认调用prototype对象的constructor属性。<br><code>alert(cat1.constructor == Cat.prototype.constructor); // true</code><br>因此，在运行”Cat.prototype = new Animal();”这一行之后，cat1.constructor也指向Animal！<br><code>alert(cat1.constructor == Animal); // true</code><br>这显然会导致继承链的紊乱（cat1明明是用构造函数Cat生成的），因此我们必须手动纠正，将Cat.prototype对象的constructor值改为Cat。这就是第二行的意思。<br>这是很重要的一点，编程时务必要遵守。下文都遵循这一点，即如果替换了prototype对象，<br><code>o.prototype = {};</code><br>那么，下一步必然是为新的prototype对象加上constructor属性，并将这个属性指回原来的构造函数。<br><code>o.prototype.constructor = o;</code></p>
+<h5 id="三、-直接继承prototype"><a href="#三、-直接继承prototype" class="headerlink" title="三、 直接继承prototype"></a>三、 直接继承prototype</h5><p>第三种方法是对第二种方法的改进。由于Animal对象中，不变的属性都可以直接写入Animal.prototype。所以，我们也可以让Cat()跳过 Animal()，直接继承Animal.prototype。</p>
+<p>现在，我们先将Animal对象改写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">function Animal()&#123; &#125;</div><div class="line">Animal.prototype.species = &quot;动物&quot;;</div></pre></td></tr></table></figure></p>
+<p>然后，将Cat的prototype对象，然后指向Animal的prototype对象，这样就完成了继承。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">Cat.prototype=Animal.prototype;</div><div class="line">Cat.prototype.constructor=Cat;</div><div class="line">var cat1=new Cat(&quot;one&quot;,&quot;two&quot;);</div><div class="line">alert(cat1.species);</div></pre></td></tr></table></figure></p>
+<p>与前一种方法相比，这样做的优点是效率比较高（不用执行和建立Animal的实例了），比较省内存。缺点是 Cat.prototype和Animal.prototype现在指向了同一个对象，那么任何对Cat.prototype的修改，都会反映到Animal.prototype。<br>所以，上面这一段代码其实是有问题的。请看第二行<br><code>Cat.prototype.constructor = Cat;</code><br>这一句实际上把Animal.prototype对象的constructor属性也改掉了！<br><code>alert(Animal.prototype.constructor); // Cat</code></p>
+<h4 id="四、-利用空对象作为中介"><a href="#四、-利用空对象作为中介" class="headerlink" title="四、 利用空对象作为中介"></a>四、 利用空对象作为中介</h4><p>由于”直接继承prototype”存在上述的缺点，所以就有第四种方法，利用一个空对象作为中介。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">var F=function()&#123;&#125;;</div><div class="line">F.prototype=Animal.prototype;</div><div class="line">Cat.prototype=new F();</div><div class="line">Cat.prototype.constructor=Cat;</div></pre></td></tr></table></figure></p>
+<p>F是空对象，所以几乎不占内存。这时，修改Cat的prototype对象，就不会影响到Animal的prototype对象。<br><code>alert(Animal.prototype.constructor); // Animal</code><br>我们将上面的方法，封装成一个函数，便于使用。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">function extend(Child,Parent)&#123;</div><div class="line">	F.prototype=Parent.prototype;</div><div class="line">	Child.prototype=new F();</div><div class="line">	Child.prototype.constructor=Child;</div><div class="line">	Child.uber=Parent.prototype;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>使用的时候，方法如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">extend(Cat,Animal);</div><div class="line">var cat1=new Cat(&quot;one&quot;,&quot;two&quot;);</div><div class="line">alert(cat1.species);</div></pre></td></tr></table></figure></p>
+<p>这个extend函数，就是YUI库如何实现继承的方法。<br>另外，说明一点，函数体最后一行<br><code>Child.uber = Parent.prototype;</code><br>意思是为子对象设一个uber属性，这个属性直接指向父对象的prototype属性。（uber是一个德语词，意思是”向上”、”上一层”。）这等于在子对象上打开一条通道，可以直接调用父对象的方法。这一行放在这里，只是为了实现继承的完备性，纯属备用性质。</p>
+<h4 id="五、-拷贝继承"><a href="#五、-拷贝继承" class="headerlink" title="五、 拷贝继承"></a>五、 拷贝继承</h4><p>上面是采用prototype对象，实现继承。我们也可以换一种思路，纯粹采用”拷贝”方法实现继承。简单说，如果把父对象的所有属性和方法，拷贝进子对象，不也能够实现继承吗？这样我们就有了第五种方法。<br>首先，还是把Animal的所有不变属性，都放到它的prototype对象上。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">function Animal()&#123;</div><div class="line">	Animal.prototype.species=&quot;animal&quot;;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>然后，再写一个函数，实现属性拷贝的目的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">function extend2(Child,Parent)&#123;</div><div class="line">	var p=Parent.prototype;</div><div class="line">	var c=Child.prototype;</div><div class="line">	for(var i in p)&#123;</div><div class="line">		c[i]=p[i];</div><div class="line">	&#125;</div><div class="line">	c.uber=p;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>这个函数的作用，就是将父对象的prototype对象中的属性，一一拷贝给Child对象的prototype对象。<br>使用的时候，这样写：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">extend2(Cat,Animal)&#123;</div><div class="line">	var cat1=new Cat(&quot;one&quot;,&quot;two&quot;);</div><div class="line">	alert(cat1.species);</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2017/03/23/javascript/构造函数的继承/" data-id="cj5vwlfyo000qg07nhaqzyn3m" class="article-share-link">Delen</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/javascript/">javascript</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/03/26/javascript/何所谓favicon.ico/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Nieuwer</strong>
+      <div class="article-nav-title">
+        
+          何所谓favicon.ico
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/03/22/javascript/函数的继承/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Ouder</strong>
+      <div class="article-nav-title">javascript正则表达式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Labels</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/git/">git</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript/">javascript</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/javascript、-angular1/">javascript、 angular1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tags/">tags</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/win10/">win10</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/git/" style="font-size: 15px;">git</a> <a href="/tags/javascript/" style="font-size: 20px;">javascript</a> <a href="/tags/javascript、-angular1/" style="font-size: 10px;">javascript、 angular1</a> <a href="/tags/tags/" style="font-size: 10px;">tags</a> <a href="/tags/win10/" style="font-size: 10px;">win10</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archieven</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">June 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">May 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">April 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">March 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">February 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/12/">December 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/11/">November 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/10/">October 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/09/">September 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/05/">May 2016</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recente berichten</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2017/06/12/nvm install in MAC/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/31/title: gitHub-hexo-Next个人博客搭建记录/">(no title)</a>
+          </li>
+        
+          <li>
+            <a href="/2017/05/14/语义化版本2.0/">语义化版本 2.0.1</a>
+          </li>
+        
+          <li>
+            <a href="/2017/04/22/javascript/Angular2核心概念/">Angular2 核心概念</a>
+          </li>
+        
+          <li>
+            <a href="/2017/03/26/javascript/何所谓favicon.ico/">何所谓favicon.ico</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2017 Psweet<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
